@@ -1,10 +1,13 @@
 package com.grosalex.sidetoilets.activity
 
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -46,10 +49,36 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.Vi
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        /*val sydney = LatLng(-34.0, 151.0)
-        this.googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))*/
+        displayMyLocation()
+    }
+
+    private fun askForLocationPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+            LOCATION_PERMISSION_REQUEST_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            LOCATION_PERMISSION_REQUEST_CODE -> if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                displayMyLocation()
+            }
+            else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
+    }
+
+    private fun displayMyLocation() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            askForLocationPermission()
+        } else {
+            googleMap.isMyLocationEnabled = true
+        }
     }
 
     override fun onError(message: String) {
@@ -67,5 +96,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.Vi
         list.forEach { marker ->
             googleMap.addMarker(MarkerOptions().position(marker.latLng))
         }
+    }
+
+    companion object {
+        const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
 }
