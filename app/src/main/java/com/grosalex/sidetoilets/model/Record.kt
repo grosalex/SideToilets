@@ -6,7 +6,7 @@ data class Record(
     @SerializedName("datasetid") val dataSetId: String?,
     @SerializedName("recordid") val recordId: String?,
     @SerializedName("record_timestamp") val recordTimeStamp: String?,
-    val field: Field?,
+    val fields: Field?,
     val geometry: Geometry?
 )
 

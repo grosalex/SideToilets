@@ -1,6 +1,6 @@
 package com.grosalex.sidetoilets.contract
 
-import com.grosalex.sidetoilets.model.Marker
+import com.grosalex.sidetoilets.model.MarkerData
 import com.grosalex.sidetoilets.model.Record
 
 interface ToiletsContract {
@@ -8,7 +8,7 @@ interface ToiletsContract {
     interface View {
         fun onError(message: String)
         fun onLoading()
-        fun onBindToiletsList(list: List<Marker>)
+        fun onBindToiletsList(list: List<MarkerData>)
     }
 
     interface Presenter {

@@ -12,15 +12,21 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.grosalex.sidetoilets.R
 import com.grosalex.sidetoilets.contract.ToiletsContract
-import com.grosalex.sidetoilets.model.Marker
+import com.grosalex.sidetoilets.model.MarkerData
 import com.grosalex.sidetoilets.presenter.ToiletsPresenter
 import com.grosalex.sidetoilets.provider.ToiletsProvider
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.View {
+
+    private val markerClickListener: GoogleMap.OnMarkerClickListener =
+        GoogleMap.OnMarkerClickListener { marker ->
+            marker.showInfoWindow()
+            true
+        }
 
     private lateinit var presenter: ToiletsPresenter
 
@@ -48,6 +54,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.Vi
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
+        googleMap.setOnMarkerClickListener(markerClickListener)
 
         displayMyLocation()
     }
@@ -90,11 +97,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.Vi
         loader.visibility = View.VISIBLE
     }
 
-    override fun onBindToiletsList(list: List<Marker>) {
+    override fun onBindToiletsList(list: List<MarkerData>) {
         loader.visibility = View.GONE
 
         list.forEach { marker ->
-            googleMap.addMarker(MarkerOptions().position(marker.latLng))
+            googleMap.addMarker(MarkerOptions().position(marker.latLng).title(marker.title).snippet(marker.snippets))
         }
     }
 
