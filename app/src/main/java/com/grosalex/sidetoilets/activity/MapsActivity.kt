@@ -3,6 +3,8 @@ package com.grosalex.sidetoilets.activity
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -46,6 +48,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.Vi
 
         presenter = ToiletsPresenter(this, ToiletsProvider())
         presenter.getToilets()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.map_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.refresh -> {
+            presenter.getToilets()
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
     }
 
     private fun initView() {
@@ -99,7 +114,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.Vi
 
     override fun onBindToiletsList(list: List<MarkerData>) {
         loader.visibility = View.GONE
-
+        googleMap.clear()
         list.forEach { marker ->
             googleMap.addMarker(MarkerOptions().position(marker.latLng).title(marker.title).snippet(marker.snippets))
         }
