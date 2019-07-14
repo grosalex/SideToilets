@@ -50,7 +50,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.Vi
         initView()
 
         presenter = ToiletsPresenter(this, ToiletsProvider())
-        presenter.getToilets()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -97,6 +96,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.Vi
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
+        presenter.getToilets()
         googleMap.setOnMarkerClickListener(markerClickListener)
 
         displayMyLocation()

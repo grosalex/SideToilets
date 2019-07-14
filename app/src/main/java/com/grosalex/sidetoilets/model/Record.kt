@@ -1,10 +1,13 @@
 package com.grosalex.sidetoilets.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+@Entity
 data class Record(
+    @PrimaryKey @SerializedName("recordid") val recordId: String,
     @SerializedName("datasetid") val dataSetId: String?,
-    @SerializedName("recordid") val recordId: String?,
     @SerializedName("record_timestamp") val recordTimeStamp: String?,
     val fields: Field?,
     val geometry: Geometry?

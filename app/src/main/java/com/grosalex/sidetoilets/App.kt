@@ -20,7 +20,7 @@ class App : Application() {
         service = retrofit.create<RatpService>(RatpService::class.java)
         app = this
 
-        dataRepository = DataRepository()
+        dataRepository = DataRepository(this)
     }
 
     companion object {

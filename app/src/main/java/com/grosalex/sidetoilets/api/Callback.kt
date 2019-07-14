@@ -9,6 +9,7 @@ import retrofit2.Response
 abstract class ApiCallBack<T>: Callback<T> {
     override fun onFailure(call: Call<T>, t: Throwable) {
         Log.e("WsError",t.message)
+        t.message?.let { onAnyError(it) }
     }
 
     override fun onResponse(call: Call<T>, response: Response<T>) {
