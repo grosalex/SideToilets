@@ -1,5 +1,6 @@
 package com.grosalex.sidetoilets.presenter
 
+import androidx.annotation.VisibleForTesting
 import com.google.android.gms.maps.model.LatLng
 import com.grosalex.sidetoilets.contract.ToiletsContract
 import com.grosalex.sidetoilets.model.ToiletData
@@ -10,6 +11,11 @@ class ToiletsPresenter(private val view: ToiletsContract.View, private val provi
     ToiletsContract.Provider.OnToiletsFetched {
 
     override fun onSuccess(list: List<Record>) {
+        view.onBindToiletsList(convertListRecordToToiletData(list))
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun convertListRecordToToiletData(list: List<Record>): ArrayList<ToiletData> {
         val toiletDatas: ArrayList<ToiletData> = ArrayList()
         list.forEach {
             val x = it.geometry?.coordinates?.get(1)
@@ -27,7 +33,7 @@ class ToiletsPresenter(private val view: ToiletsContract.View, private val provi
                 )
             }
         }
-        view.onBindToiletsList(toiletDatas)
+        return toiletDatas
     }
 
     override fun onFailure(message: String) {
