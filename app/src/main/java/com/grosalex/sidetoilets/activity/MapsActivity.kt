@@ -14,13 +14,13 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.grosalex.sidetoilets.R
 import com.grosalex.sidetoilets.contract.ToiletsContract
-import com.grosalex.sidetoilets.model.MarkerData
+import com.grosalex.sidetoilets.model.ToiletData
 import com.grosalex.sidetoilets.presenter.ToiletsPresenter
 import com.grosalex.sidetoilets.provider.ToiletsProvider
+import com.grosalex.sidetoilets.R
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.View {
 
@@ -30,19 +30,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.Vi
             true
         }
 
+    private lateinit var menu: Menu
     private lateinit var presenter: ToiletsPresenter
-
+    private val mapFragment = SupportMapFragment.newInstance()
+    private val listFragment = ToiletsListFragment()
     private lateinit var googleMap: GoogleMap
-
     private lateinit var loader: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+
         mapFragment.getMapAsync(this)
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        fragmentTransaction.add(R.id.container, mapFragment)
+        fragmentTransaction.commit()
 
         initView()
 
@@ -52,15 +55,40 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.Vi
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.map_menu, menu)
+        this.menu = menu
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.refresh -> {
-            presenter.getToilets()
+            presenter.refreshToilets()
+            true
+        }
+        R.id.list -> {
+            switchToListFragment()
+            true
+        }
+        R.id.map -> {
+            switchToMapFragment()
             true
         }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun switchToMapFragment() {
+        supportFragmentManager.popBackStack()
+        menu.findItem(R.id.list).isVisible = true
+        menu.findItem(R.id.map).isVisible = false
+    }
+
+    private fun switchToListFragment() {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.container, listFragment)
+            .addToBackStack(listFragment.tag)
+            .commit()
+        menu.findItem(R.id.list).isVisible = false
+        menu.findItem(R.id.map).isVisible = true
     }
 
     private fun initView() {
@@ -112,11 +140,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ToiletsContract.Vi
         loader.visibility = View.VISIBLE
     }
 
-    override fun onBindToiletsList(list: List<MarkerData>) {
+    override fun onBindToiletsList(list: List<ToiletData>) {
         loader.visibility = View.GONE
         googleMap.clear()
         list.forEach { marker ->
-            googleMap.addMarker(MarkerOptions().position(marker.latLng).title(marker.title).snippet(marker.snippets))
+            googleMap.addMarker(MarkerOptions().position(marker.latLng).title(marker.title).snippet(marker.opening))
         }
     }
 

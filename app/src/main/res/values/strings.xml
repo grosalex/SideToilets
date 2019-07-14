@@ -2,4 +2,6 @@
     <string name="app_name">Side toilets</string>
     <string name="title_activity_maps">Map</string>
     <string name="refresh">refresh</string>
+    <string name="list">list</string>
+    <string name="map">map</string>
 </resources>
